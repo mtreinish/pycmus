@@ -15,9 +15,9 @@ Usage
 Using pycmus is pretty straightforward you just need to init a PyCmus object
 and then issue commands to it. For example::
 
-  from pycmus import pycmus
+  from pycmus import remote
 
-  cmus = pycmus.PyCmus()
+  cmus = remote.PyCmus()
   print(cmus.status())
 
 will connect to a running cmus instance (with the socket file in the default

@@ -3,7 +3,7 @@
 PyCmus API
 ==========
 
-.. automodule:: pycmus.pycmus
+.. automodule:: pycmus.remote
    :members:
    :undoc-members:
    :show-inheritance:
