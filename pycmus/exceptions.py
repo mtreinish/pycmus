@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pycmus.  If not, see <http://www.gnu.org/licenses/>.
 
+
 class CmusException(Exception):
     message = "An unknown exception occurred"
 
@@ -37,11 +38,14 @@ class CmusException(Exception):
     def __str__(self):
         return self._error_string
 
+
 class ConfigurationError(CmusException):
     message = "A configuration error occured"
 
+
 class CmusNotRunning(CmusException):
     message = "CMUS doesn't appear to be running, please ensure it is"
+
 
 class InvalidPassword(CmusException):
     message = "The provided password is incorrect/invalid"

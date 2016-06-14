@@ -28,7 +28,7 @@ LOG = logging.getLogger(__name__)
 
 
 class PyCmus(object):
-    """ PyCmus remote class
+    """PyCmus remote class
 
     This class is used to create a PyCmus remote object that is used to send
     commands to a running cmus. It can be used to connect to either a locally
@@ -172,7 +172,7 @@ class PyCmus(object):
 
     def player_play_file(self, play_file):
         """Send a player play command with a file
-        
+
         :param str play_file: The path or url to the file to play
         """
         self.send_cmd('player-play %s\n' % os.path.abspath(play_file))
