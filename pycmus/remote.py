@@ -64,12 +64,19 @@ class PyCmus(object):
                 LOG.warning("Provided password is ignored in the local case")
         if not self.server:
             self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, 0)
-            sa = self.socket_file
+            self.socket.connect(self.socket_file)
         else:
-            af, socktype, proto, cannonname, sa = socket.getaddrinfo(
-                self.server, self.port)[0]
-            self.socket = socket.socket(af, socket.SOCK_STREAM, proto)
-        self.socket.connect(sa)
+            for addr in socket.getaddrinfo(self.server, self.port):
+                af, socktype, proto, cannonname, sa = addr
+                try:
+                    self.socket = socket.socket(af, socket.SOCK_STREAM, proto)
+                    self.socket.connect(sa)
+                except Exception:
+                    continue
+                break
+            else:
+                raise exceptions.ConfigurationError(
+                    "Unable to connect to server %s" % self.server)
         self.socket.setblocking(0)
 
     def _get_cmus_conf_dir(self):
