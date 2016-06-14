@@ -64,15 +64,12 @@ class PyCmus(object):
                 LOG.warning("Provided password is ignored in the local case")
         if not self.server:
             self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, 0)
+            sa = self.socket_file
         else:
-            self.server = socket.getaddrinfo(self.server, self.port)
-            if len(self.server) == 2:
-                socket_type = socket.AF_INET
-            else:
-                socket_type = socket.AF_INET6
-            self.socket = socket.socket(socket_type, socket.SOCK_STREAM, 0)
-        server = self.server or self.socket_file
-        self.socket.connect(server)
+            af, socktype, proto, cannonname, sa = socket.getaddrinfo(
+                self.server, self.port)[0]
+            self.socket = socket.socket(af, socket.SOCK_STREAM, proto)
+        self.socket.connect(sa)
         self.socket.setblocking(0)
 
     def _get_cmus_conf_dir(self):
@@ -117,7 +114,7 @@ class PyCmus(object):
         if self.password:
             self.socket.sendall('passwd %s\n' % self.password)
             resp = self._read_response()
-            if resp != 1:
+            if resp.startswith('authentication failed'):
                 raise exceptions.InvalidPassword()
         self.socket.sendall(six.binary_type(cmd.encode('utf8')))
         resp = self._read_response()
@@ -130,7 +127,7 @@ class PyCmus(object):
                 data = self.socket.recv(4096)
                 if not data:
                     break
-                total_data.append(six.text_type(data))
+                total_data.append(six.text_type(data.decode('utf8')))
                 line_break = six.binary_type('\n'.encode('utf8'))
                 if data.endswith(line_break):
                     break
