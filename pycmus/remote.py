@@ -42,9 +42,13 @@ class PyCmus(object):
     :param str password: The password to use when establishing a remote
                          connection. It is a required field if a server is
                          provided. If a socket_path is used this is ignored
+    :param int port: The port to use for remote connections. If one is not
+                     provided it will just use the default port of 3000.
     """
-    def __init__(self, server=None, socket_path=None, password=None):
+    def __init__(self, server=None, socket_path=None, password=None,
+                 port=3000):
         super(PyCmus, self).__init__()
+        self.port = port
         if server:
             self.server = server
             if not password:
@@ -61,7 +65,7 @@ class PyCmus(object):
         if not self.server:
             self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, 0)
         else:
-            self.server = socket.getaddrinfo(self.server)
+            self.server = socket.getaddrinfo(self.server, self.port)
             if len(self.server) == 2:
                 socket_type = socket.AF_INET
             else:
