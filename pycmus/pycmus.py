@@ -26,6 +26,7 @@ from pycmus import exceptions
 
 LOG = logging.getLogger(__name__)
 
+
 class PyCmus(object):
 
     def __init__(self, server=None, socket_path=None, password=None):
@@ -53,8 +54,8 @@ class PyCmus(object):
         self.socket.setblocking(0)
 
     def _get_cmus_conf_dir(self):
-        if socket_path:
-            return socket_path
+        if self.socket_path:
+            return self.socket_path
         if "CMUS_HOME" in os.environ:
             conf_dir = os.environ["CMUS_HOME"]
         elif os.path.isdir(os.path.join(os.path.expanduser('~'), '.cmus')):
@@ -69,7 +70,7 @@ class PyCmus(object):
 
         else:
             os.mkdir(os.path.join(os.path.expanduser('~'), '.cmus'))
-            conf_dir = os.path.join(os.path.expanduser('~'), '.cmus') 
+            conf_dir = os.path.join(os.path.expanduser('~'), '.cmus')
         return conf_dir
 
     def _get_socket_path(self, socket_path=None):
@@ -87,12 +88,11 @@ class PyCmus(object):
         if self.password:
             self.socket.sendall('passwd %s\n' % self.password)
             resp = self._read_response()
-            print(resp)
             if resp != 1:
                 raise exceptions.InvalidPassword()
         self.socket.sendall(six.binary_type(cmd.encode('utf8')))
         resp = self._read_response()
-        print(resp)
+        return resp
 
     def _read_response(self):
         total_data = []
@@ -137,7 +137,7 @@ class PyCmus(object):
     def player_pause_playback(self):
         self.send_cmd('player-pause-playback\n')
 
-    def player_play(self, play_file):
+    def player_play_file(self, play_file):
         self.send_cmd('player-play %s\n' % os.path.abspath(play_file))
 
     def set_volume(self, volume):
