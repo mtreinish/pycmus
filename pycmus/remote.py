@@ -61,8 +61,12 @@ class PyCmus(object):
         if not self.server:
             self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, 0)
         else:
-            # TODO(mtreinish: Add support for ipv6
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
+            self.server = socket.getaddrinfo(self.server)
+            if len(self.server) == 2:
+                socket_type = socket.AF_INET
+            else:
+                socket_type = socket.AF_INET6
+            self.socket = socket.socket(socket_type, socket.SOCK_STREAM, 0)
         server = self.server or self.socket_file
         self.socket.connect(server)
         self.socket.setblocking(0)
