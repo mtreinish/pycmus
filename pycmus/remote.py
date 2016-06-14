@@ -119,7 +119,8 @@ class PyCmus(object):
         """
 
         if self.password:
-            self.socket.sendall('passwd %s\n' % self.password)
+            passwd_str = 'passwd %s\n' % self.password
+            self.socket.sendall(six.binary_type(passwd_str.encode('utf8')))
             resp = self._read_response()
             if resp.startswith('authentication failed'):
                 raise exceptions.InvalidPassword()
@@ -209,6 +210,6 @@ class PyCmus(object):
 
         :return status: The player status, it is a newline seperated string
                         with the current state of the player.
-        :rtype:
+        :rtype: str
         """
         return self.send_cmd('status\n')
