@@ -28,7 +28,21 @@ LOG = logging.getLogger(__name__)
 
 
 class PyCmus(object):
+    """ PyCmus remote class
 
+    This class is used to create a PyCmus remote object that is used to send
+    commands to a running cmus. It can be used to connect to either a locally
+    running cmus or a cmus on a remote machine that is configured to listen
+    over the network. If neither a server or a socket file are provided the
+    PyCmus object will look for a running cmus in the default locations and
+    try to connect to that.
+
+    :param str server: The remote host to connect to the cmus socket on
+    :param str socket_path: The path to the local unix socket for cmus
+    :param str password: The password to use when establishing a remote
+                         connection. It is a required field if a server is
+                         provided. If a socket_path is used this is ignored
+    """
     def __init__(self, server=None, socket_path=None, password=None):
         super(PyCmus, self).__init__()
         if server:
@@ -85,6 +99,13 @@ class PyCmus(object):
                 return os.path.join(conf_dir, 'socket')
 
     def send_cmd(self, cmd):
+        """Send a raw command to cmus
+
+        :param str cmd: The command to send to cmus
+        :return resp: The response from cmus from the issued command
+        :rtype: str
+        """
+
         if self.password:
             self.socket.sendall('passwd %s\n' % self.password)
             resp = self._read_response()
@@ -114,37 +135,68 @@ class PyCmus(object):
         return ''.join(total_data)
 
     def toggle_repeat(self):
+        """Send a toggle repeat command."""
         self.send_cmd('toggle repeat\n')
 
     def toggle_shuffle(self):
+        """Send a toggle shuffle command."""
         self.send_cmd('toggle shuffle\n')
 
     def player_stop(self):
+        """Send a player stop command."""
         self.send_cmd('player-stop\n')
 
     def player_next(self):
+        """Send a player next command."""
         self.send_cmd('player-next\n')
 
     def player_prev(self):
+        """Send a player previous command."""
         self.send_cmd('player-prev\n')
 
     def player_play(self):
+        """Send a player play command."""
         self.send_cmd('player-play\n')
 
     def player_pause(self):
+        """Send a player pause command."""
         self.send_cmd('player-pause\n')
 
     def player_pause_playback(self):
+        """Send a player pause playback command."""
         self.send_cmd('player-pause-playback\n')
 
     def player_play_file(self, play_file):
+        """Send a player play command with a file
+        
+        :param str play_file: The path or url to the file to play
+        """
         self.send_cmd('player-play %s\n' % os.path.abspath(play_file))
 
     def set_volume(self, volume):
+        """Send a player set volume command
+
+        :param int volume: the volume to set the volume to
+        """
         self.send_cmd('vol %s\n' % volume)
 
     def seek(self, seek):
+        """Send a player seek command
+
+        :param seek: The position to seek the player to. This can either be a
+                     raw integer which will be the position in number of secs
+                     (where 0 is the start of the file) or it can be an +/- #
+                     offset where the position will either either move forward
+                     or backwards respectively the number of seconds specified
+        """
+
         self.send_cmd('seek %s\n' % seek)
 
     def status(self):
+        """Send a status command
+
+        :return status: The player status, it is a newline seperated string
+                        with the current state of the player.
+        :rtype:
+        """
         return self.send_cmd('status\n')
