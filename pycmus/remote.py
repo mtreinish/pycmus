@@ -213,3 +213,31 @@ class PyCmus(object):
         :rtype: str
         """
         return self.send_cmd('status\n')
+
+    def get_status_dict(self):
+        """Send a status command and format response as a dictionary
+
+        :return status: The player status, it is a newline seperated string
+                        with the current state of the player.
+        :rtype: dict
+        """
+        status_str = self.status()
+        status_list = status_str.split('\n')
+        status_dict = {'tag': {}, 'set': {}}
+        for line in status_list:
+            line_split = line.split(' ')
+            if len(line_split) == 2:
+                status_dict[line_split[0]] = line_split[1]
+            elif len(line_split) > 2:
+                # If there are spaces in the filename handle this case
+                if line_split[0] == 'file':
+                    status_dict['file'] = ' '.join(line_split[1:])
+                else:
+                    if line_split[0] not in status_dict:
+                        status_dict[line_split[0]] = {}
+                    status_dict[line_split[0]][line_split[1]] = ' '.join(
+                        line_split[2:])
+        if status_dict == {'tag': {}, 'set': {}}:
+            return None
+        else:
+            return status_dict
