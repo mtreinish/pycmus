@@ -20,6 +20,7 @@ import mock
 from pycmus import remote
 from pycmus.tests import base
 
+
 class TestRemote(base.TestCase):
 
     @mock.patch('socket.socket')
