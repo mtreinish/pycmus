@@ -67,7 +67,7 @@ class PyCmus(object):
             self.socket.connect(self.socket_file)
         else:
             for addr in socket.getaddrinfo(self.server, self.port):
-                af, socktype, proto, cannonname, sa = addr
+                af, _, proto, _, sa = addr
                 try:
                     self.socket = socket.socket(af, socket.SOCK_STREAM, proto)
                     self.socket.connect(sa)
@@ -79,9 +79,9 @@ class PyCmus(object):
                     "Unable to connect to server %s" % self.server)
         self.socket.setblocking(0)
 
-    def _get_cmus_conf_dir(self):
-        if self.socket_path:
-            return self.socket_path
+    def _get_cmus_conf_dir(self, socket_path=None):
+        if socket_path:
+            return socket_path
         if "CMUS_HOME" in os.environ:
             conf_dir = os.environ["CMUS_HOME"]
         elif os.path.isdir(os.path.join(os.path.expanduser('~'), '.cmus')):
@@ -107,7 +107,7 @@ class PyCmus(object):
                 return os.path.join(os.environ["XDG_RUNTIME_DIR"],
                                     "cmus-socket")
             else:
-                conf_dir = self._get_cmus_conf_dir()
+                conf_dir = self._get_cmus_conf_dir(socket_path)
                 return os.path.join(conf_dir, 'socket')
 
     def send_cmd(self, cmd):
